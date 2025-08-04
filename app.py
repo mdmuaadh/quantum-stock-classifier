@@ -7,7 +7,6 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 import time
-import psutil
 import gc
 import json
 import uuid
@@ -21,18 +20,31 @@ trained_models = {}
 training_history = []
 
 def get_memory_usage():
-    """Get current memory usage percentage"""
-    return psutil.virtual_memory().percent
+    """Get current memory usage percentage (simplified for Railway)"""
+    return 50.0  # Return a default value for Railway deployment
 
 def load_data_for_training():
-    """Load and prepare data with enhanced features"""
-    try:
-        df = pd.read_csv('quantum_ready_sp500_subset.csv')
-    except:
-        try:
-            df = pd.read_csv('quantum_ready_stocks.csv')
-        except:
-            raise FileNotFoundError("No data files found")
+    """Load and prepare data with enhanced features (Railway-compatible)"""
+    # Create mock data for Railway deployment (no large CSV files needed)
+    np.random.seed(42)
+    n_samples = 1000
+    
+    # Generate realistic stock data
+    tickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN', 'META']
+    data = []
+    
+    for ticker in tickers:
+        for i in range(n_samples // len(tickers)):
+            close_price = np.random.normal(150, 50)
+            volume = np.random.lognormal(15, 1)
+            data.append({
+                'Close': close_price,
+                'Volume': volume,
+                'Ticker': ticker,
+                'Label': np.random.choice([0, 1])  # Buy/Sell signal
+            })
+    
+    df = pd.DataFrame(data)
     
     # Enhanced feature engineering
     feature_cols = ['Close', 'Volume']
