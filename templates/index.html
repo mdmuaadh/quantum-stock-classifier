@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum AI - Stock Intelligence Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            padding: 80px 0 60px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #a855f7 50%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .main-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            margin-bottom: 40px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .main-panel:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(168, 85, 247, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .panel-header {
+            padding: 40px 40px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .panel-header h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        .panel-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .panel-content {
+            padding: 20px 40px 40px;
+        }
+
+        .training-section {
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            font-size: 16px;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+            color: white;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 20px 40px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .results-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-panel.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .model-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .model-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .model-card.best {
+            border: 3px solid #4CAF50;
+            background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
+        }
+
+        .model-card h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .accuracy {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 5px;
+        }
+
+        .prediction-section {
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .prediction-section.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .prediction-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .prediction-result {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .prediction-result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .prediction-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .confidence {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(168, 85, 247, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 400;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .panel-content {
+                padding: 20px;
+            }
+            
+            .prediction-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-gradient"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-brain"></i> Quantum AI</h1>
+            <p>Advanced Stock Intelligence Platform with AI-Powered Predictions</p>
+        </div>
+
+        <!-- Interactive Dashboard -->
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value" id="memory-usage">--</div>
+                    <div class="stat-label">Memory Usage</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value" id="active-models">0</div>
+                    <div class="stat-label">Active Models</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value" id="total-trainings">0</div>
+                    <div class="stat-label">Predictions Made</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Training Panel -->
+        <div class="main-panel">
+            <div class="panel-header">
+                <h2><i class="fas fa-rocket"></i> Turbo Quantum Trainer</h2>
+                <p>Train multiple AI models in seconds with quantum-inspired algorithms</p>
+            </div>
+            
+            <div class="panel-content">
+                <div class="training-section">
+                    <div class="form-group">
+                        <label for="sample-size">
+                            <i class="fas fa-database"></i> Training Sample Size
+                        </label>
+                        <input type="range" id="sample-size" class="form-control" 
+                               min="500" max="5000" value="1000" step="250">
+                        <div style="text-align: center; margin-top: 10px;">
+                            <span id="sample-size-value">1000</span> samples
+                            <small style="display: block; color: #666; margin-top: 5px;">
+                                Larger samples = higher accuracy but slower training
+                            </small>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <button id="train-btn" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Start Training
+                        </button>
+                    </div>
+
+                    <!-- Loading Animation -->
+                    <div id="loading" class="loading">
+                        <div class="spinner"></div>
+                        <p>Training quantum-inspired models...</p>
+                        <p><small>This usually takes 3-10 seconds</small></p>
+                    </div>
+
+                    <!-- Alert Messages -->
+                    <div id="alert" class="alert"></div>
+
+                    <!-- Training Results -->
+                    <div id="results" class="results-panel">
+                        <h3><i class="fas fa-trophy"></i> Training Results</h3>
+                        <div id="training-info" style="margin-bottom: 20px;"></div>
+                        <div id="model-results" class="model-results"></div>
+                    </div>
+                </div>
+
+                <!-- Prediction Section -->
+                <div id="prediction-section" class="prediction-section">
+                    <h3><i class="fas fa-crystal-ball"></i> Make Predictions</h3>
+                    <p>Enter stock data to predict price movement</p>
+                    
+                    <div class="prediction-inputs">
+                        <div class="form-group">
+                            <label for="close-price">Close Price ($)</label>
+                            <input type="number" id="close-price" class="form-control" 
+                                   placeholder="e.g., 150.50" step="0.01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="volume">Volume</label>
+                            <input type="number" id="volume" class="form-control" 
+                                   placeholder="e.g., 1000000" step="1000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="ticker">Ticker Symbol</label>
+                            <select id="ticker" class="form-control">
+                                <option value="AAPL">AAPL - Apple Inc.</option>
+                                <option value="GOOGL">GOOGL - Alphabet Inc.</option>
+                                <option value="MSFT">MSFT - Microsoft Corp.</option>
+                                <option value="AMZN">AMZN - Amazon.com Inc.</option>
+                                <option value="TSLA">TSLA - Tesla Inc.</option>
+                                <option value="META">META - Meta Platforms</option>
+                                <option value="NVDA">NVDA - NVIDIA Corp.</option>
+                                <option value="NFLX">NFLX - Netflix Inc.</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <button id="predict-btn" class="btn btn-secondary">
+                            <i class="fas fa-magic"></i> Predict Price Movement
+                        </button>
+                    </div>
+
+                    <div id="prediction-result" class="prediction-result">
+                        <div id="prediction-text" class="prediction-text"></div>
+                        <div id="confidence" class="confidence"></div>
+                        <div style="margin-top: 10px;">
+                            <small>Model used: <span id="model-used"></span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Lightning Fast</h3>
+                <p>Train multiple AI models in seconds using optimized quantum-inspired algorithms</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Multiple Models</h3>
+                <p>SVM, Random Forest, Gradient Boosting, and Ensemble predictions for maximum accuracy</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>High Accuracy</h3>
+                <p>Advanced feature engineering and model optimization for superior prediction performance</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSessionId = null;
+        
+        // Update sample size display
+        document.getElementById('sample-size').addEventListener('input', function() {
+            document.getElementById('sample-size-value').textContent = this.value;
+        });
+
+        // Update status periodically
+        function updateStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('memory-usage').textContent = data.memory_usage.toFixed(1);
+                    document.getElementById('active-models').textContent = data.active_models;
+                    document.getElementById('total-trainings').textContent = data.total_trainings;
+                });
+        }
+
+        // Show alert
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => {
+                alert.className = 'alert';
+            }, 5000);
+        }
+
+        // Train models
+        document.getElementById('train-btn').addEventListener('click', function() {
+            const sampleSize = parseInt(document.getElementById('sample-size').value);
+            const trainBtn = document.getElementById('train-btn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const predictionSection = document.getElementById('prediction-section');
+
+            // Show loading
+            trainBtn.disabled = true;
+            loading.className = 'loading show';
+            results.className = 'results-panel';
+            predictionSection.className = 'prediction-section';
+
+            fetch('/train', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sample_size: sampleSize
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                currentSessionId = data.session_id;
+
+                // Hide loading
+                loading.className = 'loading';
+                trainBtn.disabled = false;
+
+                // Show results
+                results.className = 'results-panel show';
+                predictionSection.className = 'prediction-section show';
+
+                // Update training info
+                document.getElementById('training-info').innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; text-align: center;">
+                        <div>
+                            <strong>Sample Size</strong><br>
+                            <span style="font-size: 1.2rem; color: #4CAF50;">${data.sample_size}</span>
+                        </div>
+                        <div>
+                            <strong>Features Used</strong><br>
+                            <span style="font-size: 1.2rem; color: #4CAF50;">${data.features_used}</span>
+                        </div>
+                        <div>
+                            <strong>Training Time</strong><br>
+                            <span style="font-size: 1.2rem; color: #4CAF50;">${data.training_time.toFixed(2)}s</span>
+                        </div>
+                        <div>
+                            <strong>Memory Usage</strong><br>
+                            <span style="font-size: 1.2rem; color: #4CAF50;">${data.memory_usage.toFixed(1)}%</span>
+                        </div>
+                    </div>
+                `;
+
+                // Show model results
+                const modelResults = document.getElementById('model-results');
+                modelResults.innerHTML = '';
+                
+                Object.entries(data.accuracies).forEach(([model, accuracy]) => {
+                    const isBest = model === data.best_model;
+                    const card = document.createElement('div');
+                    card.className = `model-card ${isBest ? 'best' : ''}`;
+                    card.innerHTML = `
+                        <h4>${model} ${isBest ? '👑' : ''}</h4>
+                        <div class="accuracy">${(accuracy * 100).toFixed(1)}%</div>
+                        <small>${isBest ? 'Best Model' : 'Alternative'}</small>
+                    `;
+                    modelResults.appendChild(card);
+                });
+
+                showAlert(`Training completed! Best accuracy: ${(data.best_accuracy * 100).toFixed(1)}% with ${data.best_model}`, 'success');
+                updateStatus();
+            })
+            .catch(error => {
+                loading.className = 'loading';
+                trainBtn.disabled = false;
+                showAlert(`Training failed: ${error.message}`, 'error');
+            });
+        });
+
+        // Make prediction
+        document.getElementById('predict-btn').addEventListener('click', function() {
+            if (!currentSessionId) {
+                showAlert('Please train a model first!', 'error');
+                return;
+            }
+
+            const closePrice = parseFloat(document.getElementById('close-price').value);
+            const volume = parseInt(document.getElementById('volume').value);
+            const ticker = document.getElementById('ticker').value;
+
+            if (!closePrice || !volume) {
+                showAlert('Please enter valid Close Price and Volume', 'error');
+                return;
+            }
+
+            const predictBtn = document.getElementById('predict-btn');
+            const predictionResult = document.getElementById('prediction-result');
+
+            predictBtn.disabled = true;
+            predictionResult.className = 'prediction-result';
+
+            // Prepare features (simplified mapping)
+            const features = {
+                'Close': closePrice,
+                'Volume': volume,
+                'Volume_log': Math.log1p(volume),
+                'Close_pct_change': 0,
+                'Price_volatility': 0,
+                'Ticker_freq': 1000,
+                'Ticker_num': ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA', 'NFLX'].indexOf(ticker),
+                'Volume_Price_ratio': Math.log1p(volume) / (closePrice + 1e-8)
+            };
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    session_id: currentSessionId,
+                    features: features
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                predictBtn.disabled = false;
+                predictionResult.className = 'prediction-result show';
+
+                document.getElementById('prediction-text').textContent = data.prediction_text;
+                document.getElementById('confidence').textContent = `Confidence: ${(data.confidence * 100).toFixed(1)}%`;
+                document.getElementById('model-used').textContent = data.model_used;
+
+                // Color based on prediction
+                const predictionText = document.getElementById('prediction-text');
+                predictionText.style.color = data.prediction === 1 ? '#4CAF50' : '#f44336';
+            })
+            .catch(error => {
+                predictBtn.disabled = false;
+                showAlert(`Prediction failed: ${error.message}`, 'error');
+            });
+        });
+
+        // Initialize
+        updateStatus();
+        setInterval(updateStatus, 10000); // Update every 10 seconds
+    </script>
+</body>
+</html>
